@@ -1,5 +1,0 @@
-outs:
-- md5: e5dc0f55fc7f47f03a0a0f226e917a88
-  size: 13623130
-  hash: md5
-  path: bank_transactions.csv
