@@ -29,26 +29,15 @@ from sklearn.neighbors import KNeighborsClassifier
 
 # Import your preprocessing pipeline
 from pipeline_preprocessing import preprocessing_pipeline
+import mlflow
+
+mlflow.autolog(disable=False)
 
 
 # ---------------------------
 # Azure ML Job Context Setup
 # ---------------------------
-# Get the Azure ML run context (so logs are visible in the portal)
-run = Run.get_context()
-
-if run.id.startswith("OfflineRun"):
-    # Running locally
-    ws = Workspace.from_config(path="./config.json")
-    mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())
-else:
-    # Running on Azure ML Compute
-    ws = run.experiment.workspace
-    mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())
-
-mlflow.set_experiment("fraud-detection-training")
-
-print(" Connected to Azure ML Workspace:", ws.name)
+#
 
 
 # ---------------------------
@@ -129,7 +118,7 @@ best_run_id = None
 best_pipeline = None
 
 for name, model in models.items():
-    with mlflow.start_run(run_name=name):
+    with mlflow.start_run(run_name=name, nested=True):
         print(f"\n--- Training {name} ---")
 
         model_pipeline = Pipeline(

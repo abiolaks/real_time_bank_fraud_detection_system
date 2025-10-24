@@ -112,7 +112,7 @@ best_run_id = None
 best_pipeline = None
 
 for name, model in models.items():
-    with mlflow.start_run(run_name=name) as run:
+    with mlflow.start_run(run_name=name, nested=True) as run:
         run_id = run.info.run_id
         print(f"\n--- Training {name} (run_id={run_id}) ---")
 
