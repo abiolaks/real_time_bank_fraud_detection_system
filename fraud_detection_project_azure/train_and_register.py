@@ -27,7 +27,10 @@ from pipeline_preprocessing import preprocessing_pipeline
 # ---------------------------
 # Load data
 # ---------------------------
-df = pd.read_csv("../data/raw/bank_transactions.csv", parse_dates=["timestamp"])
+import os
+os.chdir("../fraud_detection_project_azure")
+print("Current working directory:", os.getcwd())
+df = pd.read_csv("./data/transactions.csv", parse_dates=["timestamp"])
 
 X = df.drop(columns=["is_fraud"])
 y = df["is_fraud"]
