@@ -18,7 +18,7 @@ ml_client = MLClient.from_config(credential=DefaultAzureCredential())
 
 # 2 Define environment (from environment.yml)
 env = Environment(
-    name="fraud-detection-env",
+    name="fraud-detection-env_v3",
     description="Environment for fraud detection training",
     conda_file="environment.yml",
     image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest"
@@ -31,9 +31,9 @@ job = command(
     command="python train_and_register.py",  # your training script
     environment=env,
     compute="alawani2",  # existing compute cluster
-    experiment_name="fraud_detection_train_v2",
-    display_name="bank-fraud-train-job",
-    description="Train fraud detection model on AzureML compute",
+    experiment_name="fraud_detection_train_v3",
+    display_name="bank-fraud-train-job_v3",
+    description="Train fraud detection model on AzureML compute"
 )
 
 # Submit job
