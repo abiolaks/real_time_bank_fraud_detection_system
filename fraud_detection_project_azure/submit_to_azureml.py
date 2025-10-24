@@ -28,11 +28,11 @@ env = Environment(
 # Define the job
 job = command(
     code="./",  # folder containing your scripts
-    command="python train_model.py",  # your training script
-    environment="AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1",
+    command="python train_and_register.py",  # your training script
+    environment=env,
     compute="alawani2",  # existing compute cluster
-    experiment_name="fraud_detection_train",
-    display_name="fraud-train-job",
+    experiment_name="fraud_detection_train_v2",
+    display_name="bank-fraud-train-job",
     description="Train fraud detection model on AzureML compute",
 )
 
