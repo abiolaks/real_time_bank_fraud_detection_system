@@ -1,10 +1,6 @@
 # submit_to_azureml.py
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import (
-    Environment,
-    CommandJob,
-    BuildContext,
-)
+from azure.ai.ml.entities import Environment
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import command
 
