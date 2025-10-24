@@ -78,7 +78,7 @@ models = {
 # ---------------------------
 # connect MLflow to Azure ML
 # ---------------------------
-ws = Workspace.from_config(path="../config.json")
+ws = Workspace.from_config(path="./config.json")
 mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())
 mlflow.set_experiment("fraud-detection-training")
 
