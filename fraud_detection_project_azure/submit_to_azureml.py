@@ -10,6 +10,7 @@ from azure.ai.ml import command
 
 # 1 Connect to workspace
 import os
+
 os.chdir("../fraud_detection_project_azure")
 print("Current working directory:", os.getcwd())
 print("Files in current directory:", os.listdir("."))
@@ -21,7 +22,7 @@ env = Environment(
     name="fraud-detection-env_v3",
     description="Environment for fraud detection training",
     conda_file="environment.yml",
-    image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest"
+    image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest",
 )
 
 # 3 Create the training job
@@ -33,7 +34,7 @@ job = command(
     compute="alawani2",  # existing compute cluster
     experiment_name="fraud_detection_train_v3",
     display_name="bank-fraud-train-job_v3",
-    description="Train fraud detection model on AzureML compute"
+    description="Train fraud detection model on AzureML compute",
 )
 
 # Submit job

@@ -9,7 +9,12 @@ from azureml.core import Workspace
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, classification_report
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    classification_report,
 )
 from sklearn.utils.class_weight import compute_class_weight
 
@@ -28,6 +33,7 @@ from pipeline_preprocessing import preprocessing_pipeline
 # Load data
 # ---------------------------
 import os
+
 os.chdir("../fraud_detection_project_azure")
 print("Current working directory:", os.getcwd())
 df = pd.read_csv("./data/transactions.csv", parse_dates=["timestamp"])
@@ -43,9 +49,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # class weights
 # ---------------------------
 class_weights = compute_class_weight(
-    class_weight="balanced",
-    classes=np.unique(y_train),
-    y=y_train
+    class_weight="balanced", classes=np.unique(y_train), y=y_train
 )
 weights = dict(zip(np.unique(y_train), class_weights))
 print("Computed class weights:", weights)
@@ -54,12 +58,24 @@ print("Computed class weights:", weights)
 # models to evaluate
 # ---------------------------
 models = {
-    "RandomForest": RandomForestClassifier(class_weight=weights, random_state=42, n_estimators=200),
-    "XGBoost": XGBClassifier(scale_pos_weight=float(weights[1]), random_state=42, n_estimators=300, use_label_encoder=False, eval_metric="logloss"),
-    "LightGBM": LGBMClassifier(scale_pos_weight=float(weights[1]), random_state=42, n_estimators=300),
-    "LogisticRegression": LogisticRegression(class_weight=weights, max_iter=1000, random_state=42),
+    "RandomForest": RandomForestClassifier(
+        class_weight=weights, random_state=42, n_estimators=200
+    ),
+    "XGBoost": XGBClassifier(
+        scale_pos_weight=float(weights[1]),
+        random_state=42,
+        n_estimators=300,
+        use_label_encoder=False,
+        eval_metric="logloss",
+    ),
+    "LightGBM": LGBMClassifier(
+        scale_pos_weight=float(weights[1]), random_state=42, n_estimators=300
+    ),
+    "LogisticRegression": LogisticRegression(
+        class_weight=weights, max_iter=1000, random_state=42
+    ),
     "DecisionTree": DecisionTreeClassifier(class_weight=weights, random_state=42),
-    "KNN": KNeighborsClassifier(n_neighbors=5)
+    "KNN": KNeighborsClassifier(n_neighbors=5),
 }
 
 # ---------------------------
@@ -69,6 +85,7 @@ ws = Workspace.from_config(path="../config.json")
 mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())
 mlflow.set_experiment("fraud-detection-training")
 
+
 # ---------------------------
 # helper: compute metrics dict
 # ---------------------------
@@ -77,7 +94,7 @@ def compute_metrics_dict(y_true, y_pred, y_proba=None):
         "accuracy": accuracy_score(y_true, y_pred),
         "precision": precision_score(y_true, y_pred, zero_division=0),
         "recall": recall_score(y_true, y_pred, zero_division=0),
-        "f1_score": f1_score(y_true, y_pred, zero_division=0)
+        "f1_score": f1_score(y_true, y_pred, zero_division=0),
     }
     if y_proba is not None:
         try:
@@ -87,6 +104,7 @@ def compute_metrics_dict(y_true, y_pred, y_proba=None):
     else:
         metrics["roc_auc"] = None
     return metrics
+
 
 # ---------------------------
 # training loop: train & evaluate on train+test, log to MLflow
@@ -102,10 +120,9 @@ for name, model in models.items():
         print(f"\n--- Training {name} (run_id={run_id}) ---")
 
         # unified pipeline: preprocessing + model
-        model_pipeline = Pipeline(steps=[
-            ("preprocessor", preprocessing_pipeline),
-            ("classifier", model)
-        ])
+        model_pipeline = Pipeline(
+            steps=[("preprocessor", preprocessing_pipeline), ("classifier", model)]
+        )
 
         # fit
         model_pipeline.fit(X_train, y_train)
@@ -157,7 +174,7 @@ for name, model in models.items():
             sk_model=model_pipeline,
             artifact_path="model_pipeline",
             signature=signature,
-            input_example=example_input
+            input_example=example_input,
         )
 
         # print quick console report
@@ -183,7 +200,9 @@ for name, model in models.items():
 if best_run_id is None:
     raise RuntimeError("No successful run to register as best model.")
 
-print(f"\nBest model chosen: {best_model_name} (selection score={best_auc}), run_id={best_run_id}")
+print(
+    f"\nBest model chosen: {best_model_name} (selection score={best_auc}), run_id={best_run_id}"
+)
 
 # register the best model artifact (the model_pipeline artifact from the best run)
 model_uri = f"runs:/{best_run_id}/model_pipeline"
@@ -191,6 +210,8 @@ registered_model_name = "fraud_detection_best_pipeline"
 
 # register model in MLflow registry (which maps to Azure ML model registry when tracking URI is Azure)
 mlflow.register_model(model_uri=model_uri, name=registered_model_name)
-print(f"Registered model '{registered_model_name}' from run {best_run_id} at uri {model_uri}")
+print(
+    f"Registered model '{registered_model_name}' from run {best_run_id} at uri {model_uri}"
+)
 
 # optionally, transition model to stage "Staging"/"Production" via MLflow client (manual or automated later)
