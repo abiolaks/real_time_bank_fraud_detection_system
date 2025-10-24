@@ -1,0 +1,14 @@
+name: fraud-detection-env
+dependencies:
+  - python=3.10
+  - pip:
+      - pandas
+      - numpy
+      - scikit-learn
+      - lightgbm
+      - xgboost
+      - mlflow
+      - azureml-mlflow
+      - azure-ai-ml
+      - joblib
+      - matplotlib
